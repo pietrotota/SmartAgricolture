@@ -1,4 +1,4 @@
-package com.ttr.sensorlib;
+package tota_tagliente_riccardi.it.sensorlib;
 
 public class TemperatureSensor implements Sensor<Float> {
 

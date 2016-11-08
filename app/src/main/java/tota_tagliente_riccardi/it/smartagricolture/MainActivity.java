@@ -3,7 +3,7 @@ package tota_tagliente_riccardi.it.smartagricolture;
 import android.app.Activity;
 import android.os.Bundle;
 
-public class MainActivity extends Activity {
+public class MainActivity extends A {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
