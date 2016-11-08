@@ -7,16 +7,19 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 
 
+
 public class RestService {
 
-    public static void Post(String urlstring, String data)
+    public static int Post(String urlstring, String data)
     {
-        /*
+        HttpURLConnection conn;
+        OutputStream os;
+        InputStream is;
+
         try {
             //constants
             URL url = new URL(urlstring);
-
-            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout( 10000 );
             conn.setConnectTimeout( 15000  );
             conn.setRequestMethod("POST");
@@ -32,28 +35,24 @@ public class RestService {
             conn.connect();
 
             //setup send
-            OutputStream os = new BufferedOutputStream(conn.getOutputStream());
+            os = new BufferedOutputStream(conn.getOutputStream());
             os.write(data.getBytes());
             //clean up
             os.flush();
 
             //do somehting with response
             is = conn.getInputStream();
-            String contentAsString = readIt(is,len);
-        }
-        catch (Exception e)
-        {
-
-        }
-        finally {
-            //clean up
+            byte [] response=null;
+            int responseCode=conn.getResponseCode();//qui richiedo il codice di risposta
             os.close();
             is.close();
             conn.disconnect();
+            return responseCode;
         }
-        */
-
-
-    }
+        catch (Exception e)
+        {
+            return 0; //qui gestiamo le eccezioni che ci vengono mandate, ritorna l'errore
+        }                       // nella sezione di codice in cui richiamiamo questo metodo verificheremo la risposta del server
+            }                   // o una eventuale eccezione che si è verificata a livello applicativo
 
 }
