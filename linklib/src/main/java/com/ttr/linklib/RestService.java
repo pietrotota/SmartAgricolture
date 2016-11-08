@@ -8,7 +8,7 @@ import java.net.URL;
 
 
 
-public class RestService {
+class RestService {
 
     public static int Post(String urlstring, String data)
     {

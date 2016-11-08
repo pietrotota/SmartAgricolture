@@ -6,7 +6,7 @@ import org.json.JSONObject;
 /*
 Classe per formulare le richieste JSON che saranno passate tramite HTTP come stringhe di dati
  */
-public class JSONService {
+class JSONService {
     private JSONObject jsonObject;
     public JSONService() {
         jsonObject = new JSONObject();
