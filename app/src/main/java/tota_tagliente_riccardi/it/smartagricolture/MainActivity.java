@@ -2,7 +2,6 @@ package tota_tagliente_riccardi.it.smartagricolture;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.os.Debug;
 
 public class MainActivity extends Activity {
 

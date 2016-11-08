@@ -1,1 +1,1 @@
-include ':app', ':linklib', ':sensorlib'
+include ':app', ':linklib', ':sensorlib', ':java-json'
