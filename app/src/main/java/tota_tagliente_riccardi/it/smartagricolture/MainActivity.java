@@ -2,6 +2,7 @@ package tota_tagliente_riccardi.it.smartagricolture;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Debug;
 
 public class MainActivity extends Activity {
 
@@ -10,7 +11,9 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
     }
-    void prova () {
-        //prova commit
+
+    void Foo()
+    {
+        //  Foo
     }
 }
