@@ -1,1 +1,1 @@
-include ':app', ':linklib', ':agentlib'
+include ':app', ':linklib', ':sensorlib'
