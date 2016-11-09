@@ -6,7 +6,7 @@ package tota_tagliente_riccardi.it.sensorlib;
     ovviamente T sarà il tipo di dato letto dal sensore
  */
 
-public abstract class Sensor<T> {
+public abstract class SensorHandler<T> {
     private String sensorName="";
     public void setSensorName(String sensorName)
     {
