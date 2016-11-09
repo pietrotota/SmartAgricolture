@@ -42,7 +42,6 @@ class RestService {
 
             //do somehting with response
             is = conn.getInputStream();
-            byte [] response=null;
             int responseCode=conn.getResponseCode();//qui richiedo il codice di risposta
             os.close();
             is.close();
