@@ -2,8 +2,6 @@ package com.ttr.linklib;
 
 import tota_tagliente_riccardi.it.sensorlib.Sensor;
 
-import static android.icu.lang.UCharacter.GraphemeClusterBreak.T;
-
 public class Link implements Runnable {
 
     private String middlewareURL = null;
