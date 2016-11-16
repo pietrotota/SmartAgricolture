@@ -8,24 +8,7 @@ import android.hardware.SensorEvent;
  */
 
 public class PressureSensor extends SensorHandler {
-
-    float cPress=0;
-    Sensor mTemp= mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);;
-    @Override
-    public Float getData() {
-        return cPress;
-    }
-
-    @Override
-    //aggiorna il dato col valore corrente quando il dato è disponibile sul sensore, ovvero quando cambia la luminosità ad esempio
-    public void onSensorChanged(SensorEvent sensorEvent) {
-
-        cPress=sensorEvent.values[0];
-    }
-
-    @Override
-
-    public void onAccuracyChanged(Sensor sensor, int i) {
-
+    public PressureSensor() {
+        super("pressure_sensor", Sensor.TYPE_PRESSURE);
     }
 }
