@@ -113,7 +113,8 @@ public class HttpRequest extends AsyncTask<HttpCall, String, String> {
         } catch (IOException e) {
             e.printStackTrace();
         }finally {
-            urlConnection.disconnect();
+            if(urlConnection!=null)
+                urlConnection.disconnect();
         }
         return response.toString();
     }

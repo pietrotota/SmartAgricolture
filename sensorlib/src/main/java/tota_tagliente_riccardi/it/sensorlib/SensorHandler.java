@@ -16,6 +16,7 @@ public abstract class SensorHandler extends Activity implements SensorEventListe
     protected float data;
 
     private String sensorName = "";
+    private int type=0;
 
     protected SensorManager mSensorManager;
 
@@ -26,10 +27,9 @@ public abstract class SensorHandler extends Activity implements SensorEventListe
 
     public SensorHandler(String name, int type) {
         setSensorName(name);
-        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
-        s = mSensorManager.getDefaultSensor(type);
+        setSensorType(type);
     }
-
+    public void setSensorType(int type) {this.type=type;}
     public void setSensorName(String sensorName) {
         this.sensorName = sensorName;
     }
@@ -44,8 +44,9 @@ public abstract class SensorHandler extends Activity implements SensorEventListe
 
 
     // metodi che registrano e cancellano la registrazione dal sensore, senza di questi non si dovrebbe riuscire a recuperare il dato
-    protected void onResume() {
-        super.onResume();
+    protected void onCreate() {
+        mSensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        s = mSensorManager.getDefaultSensor(type);
 
 
     }
