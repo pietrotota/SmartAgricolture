@@ -2,10 +2,17 @@ package tota_tagliente_riccardi.it.smartagricolture;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+
+import com.ttr.linklib.JSONService;
 import com.ttr.linklib.Link;
+
+import java.util.concurrent.Executor;
+
 import tota_tagliente_riccardi.it.sensorlib.*;
 
 public class MainActivity extends Activity {
@@ -60,7 +67,16 @@ public class MainActivity extends Activity {
             link.stop();
         }
 
-        link = new Link(txtIndirizzo.getText().toString());
+        Log.d("Link << ", "Creazione in corso...");
+
+        link = new Link(txtIndirizzo.getText().toString()){
+            public void onDataCreation(final JSONService json){
+                // All'invio di ogni pacchetto, facciamo il log
+
+                // TODO: sta cosa mi sta scassando la minchia
+                //MainActivity.singleton.LogLine(json.toString());
+            }
+        };
 
         // Registra i sensori
 
@@ -71,12 +87,15 @@ public class MainActivity extends Activity {
 
         // avvia il thread
 
-        link.start();
+        Log.d("Link << ", "Avvio...");
+
+        new Thread(link).start();
 
         btnConnect.setText("Disconnetti");
     }
 
     public void LogLine(String text) {
+        Log.d("Log << ", text);
         txtLog.setText(txtLog.getText() + "\n" + text);
     }
 }

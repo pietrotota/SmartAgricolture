@@ -1,5 +1,7 @@
 package com.ttr.linklib;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -30,13 +32,15 @@ public class Link implements Runnable {
 
     private List<SensorHandler> sensors; // lista dei sensori registrati
 
-    private boolean run = false; // condizione di esecuzione del Thread
+    private boolean running = false; // condizione di esecuzione del Thread
 
     public Link(String middlewareURL) {
         this.middlewareURL = middlewareURL;
         this.sensors = new ArrayList<SensorHandler>();
         // mettiamo di default 60 secondi
-        this.setTimeout(60);
+        this.setTimeout(10); // TODO: ora lo imposto a 10 per motivi di debug
+
+        this.running = true;
     }
 
     public void setTimeout(long timeoutSec) {
@@ -44,17 +48,11 @@ public class Link implements Runnable {
     }
 
     public void setRun(boolean run) {
-        this.run = run;
-    }
-
-    public void start() {
-        if (this.run) return;
-        this.run = true;
-        this.run();
+        this.running = run;
     }
 
     public void stop() {
-        this.run = false;
+        this.running = false;
     }
 
     // Registrarli tutti insieme passando un array
@@ -69,6 +67,8 @@ public class Link implements Runnable {
     }
 
     public void sendData(String dataToSend) {
+
+        Log.d("Debug << ", "Nuovo pacchetto in invio...");
 
         // TODO: dobbiamo stare attenti al formato che si aspetta il middleware
 
@@ -96,10 +96,17 @@ public class Link implements Runnable {
     //implementazione del metodo run del thread
     @Override
     public void run() {
+
+        Log.d("Link << ", "Thread avviato");
+
+        Log.d("Thread << ", "Time to execute = " + timeout/1000);
+
         executionTime = System.currentTimeMillis();
-        while (run) {
+        while (running) {
             long temp = System.currentTimeMillis();
             if (temp - executionTime > timeout) {
+
+                Log.d("Link << ", "Generazione pacchetto...");
 
                 // crea l'oggetto json per la raccolta delle informazioni
                 JSONService messageData = new JSONService();
@@ -109,13 +116,20 @@ public class Link implements Runnable {
                     messageData.addData(sensor.getSensorName(), sensor.getData());   //aggiunta dei dati rilevati dai sensori nel file JSON
                 }
 
+                Log.d("Link << ", "Pacchetto creato");
+                Log.d("Data << ", messageData.toString());
+
                 // se vogliamo visualizzare il json dall'esterno
                 this.onDataCreation(messageData);
 
                 // invia il json
                 sendData(messageData.toString());
+
+                Log.d("Thread << ", "Time to execute = " + timeout/1000);
             }
         }
+
+        Log.d("Link << ", "Thread fermato");
     }
 
     // Se vogliamo accedervi dall'esterno, basta ridefinire questa in fase di creazione dell'oggetto
