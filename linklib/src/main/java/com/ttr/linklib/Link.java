@@ -28,16 +28,14 @@ import tota_tagliente_riccardi.it.sensorlib.SensorHandler;
 public class Link implements Runnable {
 
     private String middlewareURL = null;
+    private SensorData[] sensorsData=new SensorData[4];
     private long timeout, executionTime; //timer per il thread
 
-    private List<SensorHandler> sensors; // lista dei sensori registrati
-
     private boolean running = false; // condizione di esecuzione del Thread
-
+    public void setSensorData(SensorData[]sensorsData) {this.sensorsData=sensorsData;}
     public Link(String middlewareURL) {
         this.middlewareURL = middlewareURL;
-        this.sensors = new ArrayList<SensorHandler>();
-        // mettiamo di default 60 secondi
+        // mettiamo di default 10 secondi
         this.setTimeout(10); // TODO: ora lo imposto a 10 per motivi di debug
 
         this.running = true;
@@ -53,17 +51,6 @@ public class Link implements Runnable {
 
     public void stop() {
         this.running = false;
-    }
-
-    // Registrarli tutti insieme passando un array
-    public void setSensors(SensorHandler[] sensorsArray) {
-        for (SensorHandler sensor : sensorsArray)
-            this.sensors.add(sensor);
-    }
-
-    // Registrandoli uno ad uno
-    public void registerSensor(SensorHandler sensor) {
-        this.sensors.add(sensor);
     }
 
     public void sendData(String dataToSend) {
@@ -112,8 +99,8 @@ public class Link implements Runnable {
                 JSONService messageData = new JSONService();
 
                 executionTime = temp;
-                for (SensorHandler sensor : this.sensors) {
-                    messageData.addData(sensor.getSensorName(), sensor.getData());   //aggiunta dei dati rilevati dai sensori nel file JSON
+                for (SensorData sensor: sensorsData) {
+                    messageData.addData(sensor.getSensorName(), sensor.getSensorData());   //aggiunta dei dati rilevati dai sensori nel file JSON
                 }
 
                 Log.d("Link << ", "Pacchetto creato");

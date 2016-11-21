@@ -1,29 +1,28 @@
 package tota_tagliente_riccardi.it.smartagricolture;
 
 import android.app.Activity;
-import android.content.Intent;
+import android.content.Context;
 import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Bundle;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import com.ttr.linklib.JSONService;
 import com.ttr.linklib.Link;
+import com.ttr.linklib.SensorData;
 
-import java.util.concurrent.Executor;
+public class MainActivity extends Activity implements SensorEventListener{
 
-import tota_tagliente_riccardi.it.sensorlib.*;
-
-public class MainActivity extends Activity {
-
-    Button btnConnect;
-    TextView txtLog;
-    TextView txtIndirizzo;
-
-    Link link;
+    private Button btnConnect;
+    private TextView txtLog;
+    private TextView txtIndirizzo;
+    private SensorManager mSensorManager;
+    private SensorData[] sensorData={new SensorData(),new SensorData(),new SensorData(),new SensorData()};
+    private Sensor[] s=new Sensor[4];
+    private Link link;
 
     // Pattern singleton
     // Serve a permettere l'accesso dall'esterno, da qualsiasi parte, all'istanza della classe
@@ -51,9 +50,45 @@ public class MainActivity extends Activity {
                     }
                 }
         );
+        //registrazione dei sensori e relativi listener
+        mSensorManager =(SensorManager)this.getSystemService(Context.SENSOR_SERVICE);
+        s[0] = mSensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE);
+        s[1] = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
+        s[2] = mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
+        s[3] = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
+        mSensorManager.registerListener(this, s[0], SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, s[1], SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, s[2], SensorManager.SENSOR_DELAY_NORMAL);
+        mSensorManager.registerListener(this, s[3], SensorManager.SENSOR_DELAY_NORMAL);
+
 
     }
+    @Override
+    //aggiorna il dato col valore più corrente quando il dato è disponibile sul sensore, ovvero quando cambia la luminosità ad esempio
+    public void onSensorChanged(SensorEvent sensorEvent) {
 
+        if(sensorEvent.sensor.getType()==Sensor.TYPE_AMBIENT_TEMPERATURE) {
+            sensorData[0].setSensorData(sensorEvent.values[0]);
+            sensorData[0].setSensorName("temperature");
+        }
+        else if(sensorEvent.sensor.getType()==Sensor.TYPE_LIGHT) {
+            sensorData[1].setSensorData(sensorEvent.values[0]);
+            sensorData[1].setSensorName("light");
+        }
+        else if(sensorEvent.sensor.getType()==Sensor.TYPE_RELATIVE_HUMIDITY) {
+            sensorData[2].setSensorData(sensorEvent.values[0]);
+            sensorData[2].setSensorName("umidity");
+        }
+        else if(sensorEvent.sensor.getType()==Sensor.TYPE_PRESSURE) {
+            sensorData[3].setSensorData(sensorEvent.values[0]);
+            sensorData[3].setSensorName("pressure");
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
+    }
     void OnBtnConnectClick() {
 
         if(btnConnect.getText() == "Disconnetti")
@@ -71,25 +106,8 @@ public class MainActivity extends Activity {
 
         Log.d("Link << ", "Creazione in corso...");
 
-        link = new Link(txtIndirizzo.getText().toString()){
-            public void onDataCreation(final JSONService json){
-                // All'invio di ogni pacchetto, facciamo il log
-
-                // TODO: sta cosa mi sta scassando la minchia
-                //MainActivity.singleton.LogLine(json.toString());
-            }
-        };
-
-        // Registra i sensori ed avvia i rispettivi servizi
-        Intent intent;
-        SensorHandler[] sensors={new TemperatureSensor(this),new HumiditySensor(this),new LightSensor(this),new PressureSensor(this)};
-        for(SensorHandler sensor:sensors)
-        {
-            intent=new Intent(this,sensor.getClass());
-            link.registerSensor(sensor);
-            startService(intent);
-        }
-
+        link = new Link(txtIndirizzo.getText().toString());
+        link.setSensorData(sensorData);
         // avvia il thread
 
         Log.d("Link << ", "Avvio...");
