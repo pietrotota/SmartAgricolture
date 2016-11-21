@@ -1,6 +1,8 @@
 package tota_tagliente_riccardi.it.smartagricolture;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.hardware.Sensor;
 import android.os.Bundle;
 import android.os.Handler;
 import android.util.Log;
@@ -78,12 +80,15 @@ public class MainActivity extends Activity {
             }
         };
 
-        // Registra i sensori
-
-        link.registerSensor(new TemperatureSensor());
-        link.registerSensor(new HumiditySensor());
-        link.registerSensor(new LightSensor());
-        link.registerSensor(new PressureSensor());
+        // Registra i sensori ed avvia i rispettivi servizi
+        Intent intent;
+        SensorHandler[] sensors={new TemperatureSensor(this),new HumiditySensor(this),new LightSensor(this),new PressureSensor(this)};
+        for(SensorHandler sensor:sensors)
+        {
+            intent=new Intent(this,sensor.getClass());
+            link.registerSensor(sensor);
+            startService(intent);
+        }
 
         // avvia il thread
 

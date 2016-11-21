@@ -72,7 +72,7 @@ public class HttpRequest extends AsyncTask<HttpCall, String, String> {
     protected String doInBackground(HttpCall... params) {
         HttpURLConnection urlConnection = null;
         HttpCall httpCall = params[0];
-        StringBuilder response = new StringBuilder();
+        StringBuilder response = new StringBuilder("");
         try{
             String dataParams = getDataString(httpCall.getParams(), httpCall.getMethodtype());
 
