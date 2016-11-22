@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.NumberPicker;
 import android.widget.TextView;
 import com.ttr.linklib.Link;
 import com.ttr.linklib.SensorData;
@@ -17,6 +18,8 @@ import com.ttr.linklib.SensorData;
 public class MainActivity extends Activity implements SensorEventListener{
 
     private Button btnConnect;
+    private NumberPicker delay;
+    private int delaySec;
     private TextView txtLog;
     private TextView txtIndirizzo;
     private SensorManager mSensorManager;
@@ -37,10 +40,18 @@ public class MainActivity extends Activity implements SensorEventListener{
 
         // Inizializza gli elementi grafici
         btnConnect = (Button) findViewById(R.id.btnConnect);
-
+        delay= (NumberPicker) findViewById(R.id.delaySecond);
         txtIndirizzo = (TextView) findViewById(R.id.txtIndirizzo);
         txtLog = (TextView) findViewById(R.id.txtLog);
-
+        delay.setMinValue(1);
+        delay.setMaxValue(100);
+        delay.setValue(10);
+        delay.setOnValueChangedListener(new NumberPicker.OnValueChangeListener() {
+            @Override
+            public void onValueChange(NumberPicker numberPicker, int i, int i1) {
+                delaySec=numberPicker.getValue();
+            }
+        });
         // Definisci la logica al click del pulsante
         btnConnect.setOnClickListener(
                 new View.OnClickListener() {
@@ -66,7 +77,7 @@ public class MainActivity extends Activity implements SensorEventListener{
     @Override
     //aggiorna il dato col valore più corrente quando il dato è disponibile sul sensore, ovvero quando cambia la luminosità ad esempio
     public void onSensorChanged(SensorEvent sensorEvent) {
-
+        String text="";
         if(sensorEvent.sensor.getType()==Sensor.TYPE_AMBIENT_TEMPERATURE) {
             sensorData[0].setSensorData(sensorEvent.values[0]);
             sensorData[0].setSensorName("temperature");
@@ -83,6 +94,11 @@ public class MainActivity extends Activity implements SensorEventListener{
             sensorData[3].setSensorData(sensorEvent.values[0]);
             sensorData[3].setSensorName("pressure");
         }
+        for(SensorData s:sensorData) {
+            if(!s.toString().startsWith("null"))
+            text += s.toString() + "\n";
+        }
+        txtLog.setText(text);
     }
 
     @Override
@@ -108,6 +124,7 @@ public class MainActivity extends Activity implements SensorEventListener{
 
         link = new Link(txtIndirizzo.getText().toString());
         link.setSensorData(sensorData);
+        link.setTimeout(delaySec);
         // avvia il thread
 
         Log.d("Link << ", "Avvio...");
@@ -115,10 +132,5 @@ public class MainActivity extends Activity implements SensorEventListener{
         new Thread(link).start();
 
         btnConnect.setText("Disconnetti");
-    }
-
-    public void LogLine(String text) {
-        Log.d("Log << ", text);
-        txtLog.setText(txtLog.getText() + "\n" + text);
     }
 }

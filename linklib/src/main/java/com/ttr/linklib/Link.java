@@ -1,12 +1,7 @@
 package com.ttr.linklib;
 
 import android.util.Log;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
-
-import tota_tagliente_riccardi.it.sensorlib.SensorHandler;
 
 /*
 
@@ -29,19 +24,16 @@ public class Link implements Runnable {
 
     private String middlewareURL = null;
     private SensorData[] sensorsData=new SensorData[4];
-    private long timeout, executionTime; //timer per il thread
+    private long timeout=10, executionTime; //timer per il thread
 
     private boolean running = false; // condizione di esecuzione del Thread
     public void setSensorData(SensorData[]sensorsData) {this.sensorsData=sensorsData;}
     public Link(String middlewareURL) {
         this.middlewareURL = middlewareURL;
-        // mettiamo di default 10 secondi
-        this.setTimeout(10); // TODO: ora lo imposto a 10 per motivi di debug
-
         this.running = true;
     }
 
-    public void setTimeout(long timeoutSec) {
+    public void setTimeout(int timeoutSec) {
         this.timeout = timeoutSec * 1000;   //setto timeout in millisecondi
     }
 
