@@ -1,7 +1,12 @@
 package com.ttr.linklib;
 
 import android.util.Log;
-import java.util.HashMap;
+
+import org.json.JSONObject;
+
+import java.io.DataOutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 /*
 
@@ -9,10 +14,6 @@ import java.util.HashMap;
 
  Link link = new Link("http://.....");
 
- // registra i sensori da utilizzare
-
- link.registerSensor( 'tsensor', new TemperatureSensor );
- link.registerSensor( 'brightness', new BrightnessSensor );
 
  // avvia il processo di lettura e invio dei dati
 
@@ -47,29 +48,28 @@ public class Link implements Runnable {
 
     public void sendData(String dataToSend) {
 
-        Log.d("Debug << ", "Nuovo pacchetto in invio...");
-
-        // TODO: dobbiamo stare attenti al formato che si aspetta il middleware
-
-        HttpCall httpCall = new HttpCall(this.middlewareURL, HttpCall.POST);
-        HttpRequest request = new HttpRequest()
+        //Log.d("Debug << ", "Nuovo pacchetto in invio...");
+        URL url;
+        HttpURLConnection connection;
+        try
         {
-            @Override
-            public void onResponse(String response) {
-                super.onResponse(response);
+            url=new URL(this.middlewareURL);
+            connection = (HttpURLConnection)url.openConnection();
+            connection.setDoOutput(true);
+            connection.setChunkedStreamingMode(0);
+            connection.setRequestMethod("POST");
+            connection.setRequestProperty("Content-Type",
+                    "application/json");
+            DataOutputStream wr = new DataOutputStream(
+                    connection.getOutputStream ());
+            wr.writeBytes (dataToSend.toString());
+            wr.flush ();
+            wr.close ();
+        }
+        catch (Exception e)
+        {
 
-                // Vediamo qui se ritornare qualcosa
-
-            }
-        };
-
-        // Parametri
-        HashMap<String,String> paramsPost = new HashMap<>();
-        paramsPost.put("data", dataToSend);
-        httpCall.setParams(paramsPost);
-
-        // esegui la richiesta
-        request.execute(httpCall);
+        }
     }
 
     //implementazione del metodo run del thread
@@ -92,14 +92,12 @@ public class Link implements Runnable {
 
                 executionTime = temp;
                 for (SensorData sensor: sensorsData) {
+                    if(!sensor.toString().startsWith("null"))
                     messageData.addData(sensor.getSensorName(), sensor.getSensorData());   //aggiunta dei dati rilevati dai sensori nel file JSON
                 }
 
                 Log.d("Link << ", "Pacchetto creato");
                 Log.d("Data << ", messageData.toString());
-
-                // se vogliamo visualizzare il json dall'esterno
-                this.onDataCreation(messageData);
 
                 // invia il json
                 sendData(messageData.toString());
@@ -109,12 +107,5 @@ public class Link implements Runnable {
         }
 
         Log.d("Link << ", "Thread fermato");
-    }
-
-    // Se vogliamo accedervi dall'esterno, basta ridefinire questa in fase di creazione dell'oggetto
-    // cosi sappiamo quando il json viene creato se no rischiamo di rileggere sempre lo stesso oggetto
-    // perchè non teniamo conto di quando viene modificato
-    public void onDataCreation(JSONService json) {
-
     }
 }
