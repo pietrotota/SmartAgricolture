@@ -20,6 +20,7 @@ public class MainActivity extends Activity implements SensorEventListener{
     private Button btnConnect;
     private NumberPicker delay;
     private int delaySec;
+    private boolean[] sensorsPresence=new boolean[4];//usato per verificare quali sensori siano effettivamente presenti nel device in uso
     private TextView txtLog;
     private TextView txtIndirizzo;
     private SensorManager mSensorManager;
@@ -67,10 +68,10 @@ public class MainActivity extends Activity implements SensorEventListener{
         s[1] = mSensorManager.getDefaultSensor(Sensor.TYPE_LIGHT);
         s[2] = mSensorManager.getDefaultSensor(Sensor.TYPE_RELATIVE_HUMIDITY);
         s[3] = mSensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE);
-        mSensorManager.registerListener(this, s[0], SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, s[1], SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, s[2], SensorManager.SENSOR_DELAY_NORMAL);
-        mSensorManager.registerListener(this, s[3], SensorManager.SENSOR_DELAY_NORMAL);
+        sensorsPresence[0]=mSensorManager.registerListener(this, s[0], SensorManager.SENSOR_DELAY_NORMAL);
+        sensorsPresence[1]=mSensorManager.registerListener(this, s[1], SensorManager.SENSOR_DELAY_NORMAL);
+        sensorsPresence[2]=mSensorManager.registerListener(this, s[2], SensorManager.SENSOR_DELAY_NORMAL);
+        sensorsPresence[3]=mSensorManager.registerListener(this, s[3], SensorManager.SENSOR_DELAY_NORMAL);
 
 
     }
@@ -78,25 +79,29 @@ public class MainActivity extends Activity implements SensorEventListener{
     //aggiorna il dato col valore più corrente quando il dato è disponibile sul sensore, ovvero quando cambia la luminosità ad esempio
     public void onSensorChanged(SensorEvent sensorEvent) {
         String text="";
-        if(sensorEvent.sensor.getType()==Sensor.TYPE_AMBIENT_TEMPERATURE) {
+        if(sensorEvent.sensor.getType()==Sensor.TYPE_AMBIENT_TEMPERATURE&&sensorsPresence[0]) {
             sensorData[0].setSensorData(sensorEvent.values[0]);
-            sensorData[0].setSensorName("temperature");
+            sensorData[0].setSensorName("temperature_sensor");
+            sensorData[0].setPresence(sensorsPresence[0]);
         }
-        else if(sensorEvent.sensor.getType()==Sensor.TYPE_LIGHT) {
+        else if(sensorEvent.sensor.getType()==Sensor.TYPE_LIGHT&&sensorsPresence[1]) {
             sensorData[1].setSensorData(sensorEvent.values[0]);
-            sensorData[1].setSensorName("light");
+            sensorData[1].setSensorName("light_sensor");
+            sensorData[1].setPresence(sensorsPresence[1]);
         }
-        else if(sensorEvent.sensor.getType()==Sensor.TYPE_RELATIVE_HUMIDITY) {
+        else if(sensorEvent.sensor.getType()==Sensor.TYPE_RELATIVE_HUMIDITY&&sensorsPresence[2]) {
             sensorData[2].setSensorData(sensorEvent.values[0]);
-            sensorData[2].setSensorName("umidity");
+            sensorData[2].setSensorName("umidity_sensor");
+            sensorData[2].setPresence(sensorsPresence[2]);
         }
-        else if(sensorEvent.sensor.getType()==Sensor.TYPE_PRESSURE) {
+        else if(sensorEvent.sensor.getType()==Sensor.TYPE_PRESSURE&&sensorsPresence[3]) {
             sensorData[3].setSensorData(sensorEvent.values[0]);
-            sensorData[3].setSensorName("pressure");
+            sensorData[3].setSensorName("pressure_sensor");
+            sensorData[3].setPresence(sensorsPresence[3]);
         }
         for(SensorData s:sensorData) {
-            if(!s.toString().startsWith("null"))
-            text += s.toString() + "\n";
+            if(s.isPresent())
+                text += s.toString() + "\n";
         }
         txtLog.setText(text);
     }
